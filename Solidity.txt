@@ -1,0 +1,41 @@
+pragma solidity ^0.8.0;
+
+contract Marketplace {
+    enum ShippingStatus { Pending, Shipped, Delivered }
+    ShippingStatus public status;
+
+    event MissionComplete(ShippingStatus indexed status);
+
+    address public owner;
+
+    constructor() {
+        status = ShippingStatus.Pending;
+        owner = msg.sender;
+    }
+
+    modifier onlyOwner() {
+        require(msg.sender == owner, "Only the contract owner can perform this action");
+        _;
+    }
+
+    function Shipped() public onlyOwner {
+        require(status == ShippingStatus.Pending, "Package already shipped or delivered");
+        status = ShippingStatus.Shipped;
+        emit MissionComplete(status);
+    }
+
+    function Delivered() public onlyOwner {
+        require(status == ShippingStatus.Shipped, "Package not yet shipped or already delivered");
+        status = ShippingStatus.Delivered;
+        emit MissionComplete(status);
+    }
+
+    function getStatus() public view onlyOwner returns (ShippingStatus) {
+        return status;
+    }
+
+    function Status() public view payable returns (ShippingStatus) {
+        require(msg.value >= 1 ether, "Insufficient funds");
+        return status;
+    }
+}
